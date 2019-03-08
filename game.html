@@ -1,0 +1,147 @@
+<html>
+  <canvas id = "gameCanvas" width="850" height="600"></canvas>
+  <audio autoplay>
+    <source src="Alone.mp3" type="audio/mpeg">
+    </audio>
+ <script>
+ var canvas ;
+ var canvasContext;
+
+var ballx = 50;                     //    x position of Ball
+var bally = 50;                    //     y position of Ball
+var speedX = 5;               //     speed  in  x-axis direction
+var  speedY = 5;                //    speed   in  y-axis direction
+ // To make Player Sticks
+ var pStick1Y  = 200;
+ var  pStick2Y = 200;
+ const stickHeight = 100;
+ const  stickThickness = 20;
+ var playerName = "Nain"
+ var player1Score = 0;
+ var computerScore =0;
+ var WINNING_SCORE = 5;
+
+ // To  get Position of  mouse in the playground body
+ function mousePosition(evt){
+     var rect = canvas.getBoundingClientRect();
+     var root = document.documentElement;
+     var mouseX = evt.clientX - rect.left - root.scrollLeft;
+     var mouseY = evt.clientY - rect.top - root.scrollTop;
+     return{
+         x : mouseX,
+         y : mouseY
+     };
+ }
+   window.onload = function(){
+     canvas = document.getElementById('gameCanvas');
+     canvasContext = canvas.getContext('2d');
+     // setInterval function will call the functions -(i.e  movement(), drawBody())  after a specific  time
+     setInterval(function ()
+                                {movement();
+                                drawBody() ;
+                                },1000/30);
+
+     canvas.addEventListener('mousemove', function (evt) {
+         var mousePos = mousePosition(evt);
+         pStick1Y = mousePos.y-(stickHeight/2);
+     });
+   }
+   //  Reset the Ball
+ function ballReset() {
+     speedX  = -speedX;
+     ballx  = canvas.width/2;
+     bally  = canvas.height/2;
+ }
+   // Movement of Ball
+   function movement() {
+     compMovement();
+       ballx  = ballx + speedX;
+       bally  = bally +speedY;
+       // Boundry For X-axis
+       if(ballx  > canvas.width){
+               player1Score++;
+               if(player1Score >= WINNING_SCORE){
+                   window.alert("Player1 Wins    !!!!!!  ");
+                   player1Score = 0;
+                   computerScore = 0;
+               }
+               ballReset();
+       }
+       if(ballx < 0) {
+               computerScore++;
+               if(computerScore >= WINNING_SCORE){
+                   window.alert("Ooohhh Computer Wins!!!!!!  Better Luck Next Time");
+                   player1Score = 0;
+                   computerScore = 0;
+               }
+               ballReset();
+       }
+       //
+       if(ballx === stickThickness ){
+           if (bally > pStick1Y -25  && bally < (pStick1Y + stickHeight)+35) {
+               speedX = -speedX;
+               var deltaY = bally
+                   -(pStick1Y+stickHeight/2);
+               speedY = deltaY * 0.35;
+
+           }
+       }
+       //
+       if (ballx >= canvas.width - stickThickness && ballx < canvas.width) {
+    if (bally > pStick2Y - 20 && bally < (pStick2Y + stickHeight) + 20) { ////
+        speedX = -speedX;
+        var delta = bally -
+            (pStick2Y + stickHeight / 2); ////
+        speedY = delta * 0.35;
+    }
+}
+       // Boundry for Y-axis
+       if(bally > canvas.height){
+           speedY = -speedY;
+       }else if(bally < 0){
+           speedY = -speedY;
+       }
+   }
+   //  Computer Movement
+ function compMovement() {
+     var pStick2YCentre = pStick2Y+(stickHeight/2);
+     if(pStick2YCentre < bally- 40){
+         pStick2Y += 6;
+     }else if(pStick2YCentre > bally+40){
+         pStick2Y -= 6;
+     }
+ }
+   function drawBody(){
+                       // Outer Box or Playground
+       colorRect(0,0,canvas.width,canvas.height,'black');
+                       //  Middle Line
+       for(var i =8;i<canvas.height-5; ){
+           colorRect(canvas.width/2,i,5,30,'white');
+           colorRect(canvas.width/2-50,i+20,20,25,'black');
+           i = i + 40;
+       }
+                    // Left - Player Stick
+       colorRect(0,pStick1Y,stickThickness,stickHeight,'Green');
+
+                    // Right - Player Stick
+       colorRect(canvas.width-stickThickness,pStick2Y,20,stickHeight,'Green');
+
+                    // Ball
+       colorCircle(ballx,bally,10,'Red');
+       canvasContext.fillText(playerName,90,100);
+       canvasContext.fillText(player1Score,100,115);
+       canvasContext.fillText("Computer",canvas.width-115,100);
+       canvasContext.fillText(computerScore,canvas.width-100,115);
+   }
+   function colorRect(leftX,topY,width,height,color) {
+       canvasContext.fillStyle = color;
+       canvasContext.fillRect(leftX,topY,width,height);
+   }
+   function colorCircle(cenX,cenY,radius,color) {
+       canvasContext.fillStyle = color;
+       canvasContext.beginPath();
+       canvasContext.arc(cenX,cenY,radius,0,Math.PI*2,true);
+       canvasContext.fill();
+   }
+ </script>
+</html>
